@@ -95,4 +95,107 @@ describe('the find block with relationships', function() {
       });
     });
   });
+
+  it('should include requested relationships for findOne', function(done) {
+    Person.find().then(function(people) {
+      var personOne = people[0];
+      var personTwo = people[1];
+
+      var cat = new Animal({ name: 'Platypus' });
+      var dog = new Animal({ name: 'Dogbark' });
+
+      // one-to-one
+      personOne.spouse = personTwo;
+      // one-to-many
+      personOne.pets.push(cat, dog);
+
+      Promise.all([
+        cat.save(),
+        dog.save(),
+        personOne.save(),
+      ]).then(function() {
+        request(global.app)
+          // .get(`/people/${personOne.id}?include=spouse,dinosaurs`)
+          .get(`/people/${personOne.id}?include=spouse,pets,dinosaurs`)
+          .expect(200)
+          .expect(function(res) {
+            var { data, included } = res.body;
+            expect(data).to.have.property('relationships');
+            expect(data.relationships).to.not.have.property('dinosaurs');
+
+            // Spouse one-to-one. Two keys; not accidentally the whole document.
+            expect(data.relationships).to.have.nested.property('spouse.data.id', personTwo.id);
+            expect(data.relationships).to.have.nested.property('spouse.data.type', 'people');
+            expect(Object.keys(data.relationships.spouse.data)).to.have.lengthOf(2);
+
+            // Pets. Same treatment, but for one-to-many
+            expect(data.relationships).to.have.nested.property('pets.data');
+            expect(data.relationships.pets.data).to.be.a('array');
+            expect(data.relationships.pets.data).to.have.lengthOf(2);
+            expect(data.relationships).to.have.nested.property('pets.data[0].id', cat.id);
+            expect(data.relationships).to.have.nested.property('pets.data[0].type', 'animals');
+
+            // Data should be included
+            expect(included).to.be.a('array');
+            expect(included).to.have.lengthOf(3);
+            expect(included).to.deep.include({ type: 'animals', id: dog.id, attributes: { name: 'Dogbark' } });
+            expect(included).to.deep.include({ type: 'animals', id: cat.id, attributes: { name: 'Platypus' } });
+          })
+          .end(global.jsonAPIVerify(done));
+      });
+    });
+  });
+
+  it('should include requested relationships for findMany', function(done) {
+    Person.find().then(function(people) {
+      var personTwo = people[1];
+      var cat = new Animal({ name: 'Platypus' });
+      var dog = new Animal({ name: 'Dogbark' });
+      var queue = [];
+
+      people.forEach((person) => {
+        // one-to-one
+        // eslint-disable-next-line no-param-reassign
+        person.spouse = personTwo;
+        // one-to-many
+        person.pets.push(cat, dog);
+        queue.push(person.save());
+      });
+
+      Promise.all([
+        cat.save(),
+        dog.save(),
+        Promise.all(queue),
+      ]).then(function() {
+        request(global.app)
+          // .get(`/people/${personOne.id}?include=spouse,dinosaurs`)
+          .get('/people/?include=spouse,pets,dinosaurs')
+          .expect(200)
+          .expect(function(res) {
+            var { data, included } = res.body;
+
+            expect(data).to.be.a('array');
+            expect(data).to.have.nested.property('[0].id');
+            expect(data).to.have.nested.property('[0].type', 'people');
+            expect(data).to.have.nested.property('[0].attributes.age');
+            expect(data).to.have.nested.property('[0].relationships');
+            expect(data).to.have.nested.property('[0].relationships.pets.data[0].type', 'animals');
+            expect(data).to.not.have.nested.property('[0].relationships', 'dinosaurs');
+
+            // Two keys; not accidentally the whole document.
+            expect(Object.keys(data[0].relationships.spouse.data)).to.have.lengthOf(2);
+            expect(Object.keys(data[0].relationships.pets.data[0])).to.have.lengthOf(2);
+
+            // Data should be included
+            expect(included).to.be.a('array');
+            expect(included).to.have.lengthOf(3);
+            // eslint-disable-next-line object-curly-newline
+            expect(included).to.deep.include({ type: 'animals', id: dog.id, attributes: { name: 'Dogbark' }, relationships: {} });
+            // eslint-disable-next-line object-curly-newline
+            expect(included).to.deep.include({ type: 'animals', id: cat.id, attributes: { name: 'Platypus' }, relationships: {} });
+          })
+          .end(global.jsonAPIVerify(done));
+      });
+    });
+  });
 });
