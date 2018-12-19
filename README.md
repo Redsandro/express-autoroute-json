@@ -146,6 +146,7 @@ We are in the process of developing some more in-depth documentation (including 
 There is a tiny bit more documentation on the [wiki](https://github.com/stonecircle/express-autoroute-json/wiki) but if you have any questions or want to request some specific documentation you can reach out to me [on Twitter](https://twitter.com/real_ate)
 
 # Licence
+Copyright (c) 2019, Redsandro Media <info@redsandro.com>
 Copyright (c) 2018, Stone Circle <info@stonecircle.ie>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:

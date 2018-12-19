@@ -1,56 +1,57 @@
 {
-  "name": "express-autoroute-json",
-  "version": "3.6.3",
-  "description": "Express Auto Route Json is an automatic JSON 'REST' api builder for express-autoroute",
+  "name": "jsonapi-server-mini",
+  "version": "4.0.0",
+  "description": "Minimalistic JSON:API server for Node.js and MongoDB",
   "main": "index.js",
   "engines": {
-    "node": ">=0.10"
+    "node": ">=8.0"
   },
   "scripts": {
     "coverage": "NODE_ENV=test nyc -a report --reporter=text-lcov mocha > coverage/lcov.info",
     "lint:js": "eslint .",
-    "start-docker": "docker run -d -p 27017:27017 --rm --name express-autoroute-json-mongo mongo",
-    "stop-docker": "docker stop express-autoroute-json-mongo",
+    "start-docker": "docker run -d -p 27017:27017 --rm --name jsonapi-server-mini-mongo mongo",
+    "stop-docker": "docker stop jsonapi-server-mini-mongo",
     "test-watch": "NODE_ENV=test mocha --recursive -w --reporter min",
     "test": "NODE_ENV=test nyc -a mocha --recursive"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stonecircle/express-autoroute-json"
+    "url": "https://github.com/Redsandro/jsonapi-server-mini"
   },
   "keywords": [
     "express",
     "autoroute",
-    "json",
+    "jsonapi",
     "routing"
   ],
-  "author": "Chris Manson chris@stonecircle.io",
+  "author": "Redsandro Media <info@redsandro.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stonecircle/express-autoroute-json/issues"
+    "url": "https://github.com/Redsandro/jsonapi-server-mini/issues"
   },
-  "homepage": "https://github.com/stonecircle/express-autoroute-json",
+  "homepage": "https://github.com/Redsandro/jsonapi-server-mini",
   "devDependencies": {
     "body-parser": "^1.18.3",
     "chai": "^4.2.0",
     "eslint": "^5.9.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
     "express": "^4.16.4",
-    "express-autoroute": "^2.1.0",
     "istanbul": "^0.4.4",
     "jsonschema": "^1.2.4",
     "mocha": "^5.2.0",
-    "mongoose": "^5.3.14",
+    "mongoose": "^5.4.0",
     "nyc": "^13.1.0",
+    "q": "^1.0.1",
     "supertest": "^3.3.0",
-    "winston": "^3.1.0",
-    "q": "^1.0.1"
+    "winston": "^3.1.0"
   },
   "dependencies": {
     "camelcase-keys": "^5.0.0",
+    "cors": "^2.8.5",
+    "express-autoroute": "^2.1.0",
     "jsonapi-serializer": "^3.6.4",
     "lodash": "^4.17.11",
-    "pluralize": "^7.0.0"
+    "morgan": "^1.9.1",
+    "pluralize": "^7.0.0",
+    "recursive-readdir": "^2.2.2"
   }
 }

@@ -1,0 +1,132 @@
+{
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 8
+    },
+    "env": {
+        "node": true,
+        "browser": true,
+        "es6": true
+    },
+    "globals": {
+        "get": false
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "indent": [
+            1,
+            "tab",
+            { "SwitchCase": 1, "MemberExpression": "off" }
+        ],
+        "space-before-blocks": [
+            1
+        ],
+        "space-before-function-paren": [
+            1,
+            "never"
+        ],
+        "padded-blocks" : [
+            1,
+            "never"
+        ],
+        "quotes": [
+            1,
+            "single",
+            "avoid-escape"
+        ],
+        "no-extra-parens" : [
+            1,
+            "all",
+            { "returnAssign": false }
+        ],
+        "strict": [
+            2,
+            "global"
+        ],
+        "brace-style": [
+            1,
+            "stroustrup",
+            { "allowSingleLine": true }
+        ],
+        "no-var": [
+            1
+        ],
+        "no-unused-vars": [
+            1,
+            {
+                "args": "none"
+            }
+        ],
+        "prefer-const": [
+            1,
+            {
+                "destructuring": "any",
+                "ignoreReadBeforeAssign": false
+            }
+        ],
+        "no-multiple-empty-lines": [
+            1,
+            {
+                "max": 1,
+                "maxEOF": 1
+            }
+        ],
+        "no-fallthrough": [
+            1
+        ],
+        "no-octal": [
+            2
+        ],
+        "no-console": [
+            0
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            1,
+            "never"
+        ],
+        "no-extra-semi": [
+            1
+        ],
+        "id-length": [
+            1,
+            {
+                min : 1,
+                max : 15,
+                properties: "never"
+            }
+        ],
+        "no-restricted-modules": [
+            1,
+            "dotty",
+            "q",
+        ]
+    },
+    "overrides": [{
+        "files": ["test/**/*.js"],
+        "env": {
+            "mocha": true
+        },
+        "rules": {
+            "no-console": 0,
+            "func-names": [0],
+            "import/no-extraneous-dependencies": [0],
+            "new-cap": [2, {
+                "capIsNewExceptions": ["Q", "ObjectId"]
+            }],
+            "no-underscore-dangle": [2, {
+                "allow": ["_id"]
+            }],
+            "no-unused-expressions": [0],
+            "prefer-arrow-callback": [0],
+            "arrow-body-style": [0]
+        },
+        "globals": {
+            "rootRequire": true,
+            "rootPath": true
+        }
+    }]
+}
