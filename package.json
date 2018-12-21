@@ -9,6 +9,7 @@
   "scripts": {
     "coverage": "NODE_ENV=test nyc -a report --reporter=text-lcov mocha > coverage/lcov.info",
     "lint:js": "eslint .",
+    "start": "node ./test2",
     "start-docker": "docker run -d -p 27017:27017 --rm --name jsonapi-server-mini-mongo mongo",
     "stop-docker": "docker stop jsonapi-server-mini-mongo",
     "test-watch": "NODE_ENV=test mocha --recursive -w --reporter min",

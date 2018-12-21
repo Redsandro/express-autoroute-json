@@ -13,7 +13,7 @@ global.get = (obj, path, fallback) => path.split('.').every(el => ((obj = obj[el
 
 module.exports = async(args = {}) => {
 	const logger	= getLogger(args)
-	const mongoose	= getMongoose(args)
+	const mongoose	= await getMongoose(args)
 	const app		= getApp(args)
 	const routes	= getRoutes(args)
 	const files		= await recursive(routes, [(file, stats) => stats.isFile() && file.substr(-3) !== '.js'])
@@ -54,14 +54,30 @@ function getLogger(args) {
 /**
  * Set up default mongoose
  */
-function getMongoose(args) {
+async function getMongoose(args) {
+	//FIXME: Needs catch and retry
 	if (!args.mongoose) {
 		args.mongoose = require('mongoose')
-		args.mongoose.connect('mongodb://localhost/jsonapi-server-mini', { useNewUrlParser: true })
+		// while (args.mongoose.connection.readyState !== 1)
+		await connectMongoose(args)
 		args.logger.debug('Added default mongoose. You can specify your own mongoose instance using the `mongoose` attribute.')
 	}
 
 	return args.mongoose
+}
+
+async function connectMongoose(args, retryDelay = 1) {
+	try {
+		await args.mongoose.connect('mongodb://localhost/jsonapi-server-mini', { useNewUrlParser: true })
+		return args.mongoose
+	}
+	catch(err) {
+		args.logger.debug(err.message)
+		args.logger.info(`Connection to mongoose failed. Retrying in ${retryDelay} seconds.`)
+		await new Promise(res => setTimeout(res, retryDelay * 1000))
+		if (retryDelay < 60) retryDelay *= 2
+		return await connectMongoose(args, retryDelay)
+	}
 }
 
 /**
