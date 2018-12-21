@@ -9,6 +9,13 @@ const bodyParser	= require('body-parser')
 const cors			= require('cors')
 const morgan		= require('morgan')
 
+const methodMap		= {
+	post	: 'C   ',
+	get		: ' R  ',
+	patch	: '  U ',
+	delete	: '   D'
+}
+
 global.get = (obj, path, fallback) => path.split('.').every(el => ((obj = obj[el]) !== undefined)) ? obj : fallback
 
 module.exports = async(args = {}) => {
@@ -28,8 +35,8 @@ module.exports = async(args = {}) => {
 
 		for (const method in route) {
 			for (const path in route[method]) {
-				logger.info(`creating endpoint: ${prefix}${path}`)
 				app[method].apply(app, [`${prefix}${path}`].concat(route[method][path]))
+				logger.info(`Added [${methodMap[method]}] ${prefix}${path}`)
 			}
 		}
 	})
