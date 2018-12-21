@@ -2,7 +2,7 @@
  * @author Sander Steenhuis <info@redsandro.com> (https://www.Redsandro.com)
  * @license MIT
  */
-const generateAutoroute = require('./lib/generateAutoroute')
+const routeMapper	= require('./lib/routeMapper')
 const path			= require('path')
 const recursive		= require('recursive-readdir')
 const bodyParser	= require('body-parser')
@@ -31,7 +31,7 @@ module.exports = async(args = {}) => {
 		const routeOptions	= require(file)({mongoose})
 
 		routeOptions.model	= mongoose.model(type, routeOptions.schema)
-		const route			= generateAutoroute(routeOptions)
+		const route			= routeMapper(routeOptions)
 
 		for (const method in route) {
 			for (const path in route[method]) {
