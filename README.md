@@ -1,152 +1,260 @@
-[![Build Status](https://travis-ci.org/stonecircle/express-autoroute-json.svg?branch=master)](https://travis-ci.org/stonecircle/express-autoroute-json)
-[![dependencies Status](https://david-dm.org/stonecircle/express-autoroute-json/status.svg)](https://david-dm.org/stonecircle/express-autoroute-json)
-[![devDependencies Status](https://david-dm.org/stonecircle/express-autoroute-json/dev-status.svg)](https://david-dm.org/stonecircle/express-autoroute-json?type=dev)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3f269374a4293505f284/maintainability)](https://codeclimate.com/github/stonecircle/express-autoroute-json/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/3f269374a4293505f284/test_coverage)](https://codeclimate.com/github/stonecircle/express-autoroute-json/test_coverage)
+# jsonapi-server-mini
 
-# Express-Autoroute-JSON - automatically define your JSON:API backend
+Super easy node/mongo CRUD backend for JSON:API consuming apps like Ember.
 
-express-autoroute-json is a handy tool which allows you to declarativly define endpoints for [ExpressJS](https://expressjs.com/) that speak [JSON:API](https://jsonapi.org) natively. It is designed to make use of [_Convention Over Configuration_](https://en.wikipedia.org/wiki/Convention_over_configuration) and your endpoints should have Zero boilerplate code, and only contain the definition of your business logic.
+`jsonapi-server-mini` allows you to quickly write an [ExpressJS](https://expressjs.com/) [JSON:API](https://jsonapi.org) server. Adhering to [_Convention Over Configuration_](https://en.wikipedia.org/wiki/Convention_over_configuration). Your endpoints should have zero boilerplate code, and only contain your business logic.
+
+This module attempts to be as simple as possible, yet still be fully compliant with JSON:API. That means we should be able to do things like `sort`, `filter`, `page`, `include`, pretty much everything you need to write a descent app.
+
+On the other hand, there won't be any custom complexity. One route means one type, one model, one schema. If you want something crazy, like a custom type that uses six models and a hard-coded joke about Belgians, you should look for a heavier solution, such as the ones listed below:
+
+* [Fortune.js](http://fortune.js.org/) with [fortune-json-api](https://github.com/fortunejs/fortune-json-api)
+* [jsonapi-server](https://github.com/holidayextras/jsonapi-server) (no longer maintained)
+* [express-autoroute](https://github.com/stonecircle/express-autoroute/) with [express-autoroute-json](https://github.com/stonecircle/express-autoroute-json/)
+
+This project was forked from `express-autoroute-json` because its wide scope made it hard to land pull requests. `jsonapi-server-mini` is [KISS](https://en.wikipedia.org/wiki/KISS_principle), so we can implement the full JSON:API [base spec](https://jsonapi.org/format/) without taking complexities into account.
 
 ## Quick-start
 
-We have a handy [Yeaman](http://yeoman.io/) generator that will spin up a fully functioning backend for you in an instant. To get started, install yeoman globally and install the [@authmaker/generator-express](https://github.com/authmaker/generator-express) generator globally. Don't worry if you're not using [Authmaker](https://authmaker.com/), you can still use this generator to quickly spin up your app.
-
-```sh
-npm install -g yo
-npm install -g @authmaker/generator-express
+```bash
+npm install --save jsonapi-server-mini
 ```
 
-the generator **does not** generate a folder for you so create one and run the generator in that folder:
+### Super easy quick start
 
-```sh
-mkdir my-app-backend
-cd my-app-backend
-yo @authmaker/express
+The module contains everything to get up and running. Even test routes `/tests` and `/users`. Don't worry, they will go away once you've defined your own models. But for now, check this out!
+
+> __Note:__ For this super easy quick start, an authless mongo database is expected to run at port `27017`. You can run one for testing purposes using `docker`:
+>
+> ```bash
+> docker run -d -p 27017:27017 --rm --name jsonapi-server-mini-mongo mongo
+> ```
+
+```bash
+mkdir jsonapi-server-mini && cd $_
+npm init -y
+npm install --save jsonapi-server-mini
+echo "require('../')()" > index.js
+node .
 ```
 
-the generator will ask you a series of questions to get started, and it will also ask you for a [MongoDB connection string](https://docs.mongodb.com/manual/reference/connection-string/) and setup that database connection for you.
+Bam! We're running a server. Let's create a user
+
+```bash
+curl -X POST http://localhost:8888/api/users \
+	-H 'Content-Type: application/vnd.api+json' \
+	-d @- <<'EOF'
+{
+	"data": {
+		"type": "users",
+		"attributes": {
+			"name": "Some User",
+			"email": "test@example.com"
+		}
+	}
+}
+EOF
+```
+
+OMG! Is this real? Can we fetch the user?
+
+```bash
+wget http://localhost:8888/api/users | jq
+```
+
+Response:
+```javascript
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "5c1d81d48a162b5776ab7fd0",
+      "attributes": {
+        "name": "Some User",
+        "email": "test@example.com"
+      }
+    }
+  ]
+}
+```
 
 ## Route definitions
-If you have run the above quick-start steps you will have a file `server/routes/v1/example.js` that looks like this:
 
-```javascript
-const autorouteJson = require('express-autoroute-json');
-const { models } = require('../../../models');
+The above `/api/users` example works because you haven't defined your own resources. The fallback from `node_modules/jsonapi-server-mini/routes/api/user.js` is loaded:
 
-module.exports.autoroute = autorouteJson({
-  model: models.example,
-  resource: 'example', // this will be pluralised in the routes
+```js
+module.exports = ({mongoose}) => ({
+	schema	: new mongoose.Schema({
+		name	: String,
+		email	: String
+	}),
 
-  // default CRUD
-  find: {},
-  create: {},
-  update: {},
-  delete: {},
-});
+	// CRUD operations. Remove to disable.
+	find	: {},
+	create	: {},
+	update	: {},
+	delete	: {}
+})
 ```
 
-there are a few things to note about this example. Firstly this is a **fully functioning** example that will create endpoints to create, retrieve, update and delete _'example'_ resources. When you run the server it will show the following output
+You should create your own routes in your app's `routes` directory. You'll need to specify the full path to your own `routes` directory.
 
-```sh
-info: creating endpoint: /v1/examples      #find all     - GET
-info: creating endpoint: /v1/examples/:id  #find by id   - GET
-info: creating endpoint: /v1/examples      #create       - POST
-info: creating endpoint: /v1/examples/:id  #update       - PATCH
-info: creating endpoint: /v1/examples/:id  #delete       - DELETE
+`index.js`:
+```js
+const path = require('path')
+const jserve = require('jsonapi-server-mini')
+
+jserve({
+	routes: path.join(__dirname, 'routes')
+})
 ```
 
-you will also notice that the endpoints are prefixed with `/v1/`. This is because express-autroute-json is based on [express-autoroute](https://github.com/stonecircle/express-autoroute) which is designed to give you a nicer way to describe your node endpoints and can auto-prefix endpoints with the folder-names they are contained in.
+Any sub-directory will be appended to the route in case you want `/api/v1`, `/api/v2` etc. The filename (in singular form) decides the resource type and schema name (in plural form). Go ahead and copy the file, adding something crazy to the schema!
 
-If you want to create a _find-only_ endpoint i.e. you don't want to allow for the creation or deletion of resources then you can just remove the corresponding create, update and delete blocks from the autoroute definition.
+### Schema
 
+For defining your schema, take a look at the [Mongoose Schema](https://mongoosejs.com/docs/guide.html) documentation. Try not to make it too complex; it needs to map to JSON:API. Basically, everything is an `attribute`. To define a `relationship`, first create a route for the type of the relationship, e.g. `test.js`. Next, specify a property with its `type` set to `ObjectID` and its [`ref`](https://mongoosejs.com/docs/api.html#schematype_SchemaType-ref) to the (capitalized) (file)name of the new resource you just created:
 
-```javascript
-const autorouteJson = require('express-autoroute-json');
-const { models } = require('../../../models');
+```js
+module.exports = ({mongoose}) => ({
+	schema	: new mongoose.Schema({
+		name	: String,
+		email	: String,
 
-module.exports.autoroute = autorouteJson({
-  model: models.example,
-  resource: 'example', // this will be pluralised in the routes
-  find: {},
-});
+		// One-to-many relationship
+		myTests	: [{
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}],
+
+		// One-to-one relationship
+		lastUsed	: {
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}
+	}),
+
+	// CRUD operations. Remove to disable.
+	find	: {}
+})
 ```
 
-will result in:
+### CRUD operations
 
-```sh
-info: creating endpoint: /v1/examples      #find all     - GET
-info: creating endpoint: /v1/examples/:id  #find by id   - GET
+The comment says it all. You can remove them to disable them, or add route-specific options.
+
+### Authentication
+
+Once you've written some custom authentication logic, you can create an _Express Middleware_ function `auth` to either continue or throw an error. The same authentication applies to all CRUD methods.
+
+```js
+module.exports = ({mongoose}) => ({
+	schema	: new mongoose.Schema({
+		name	: String,
+		email	: String,
+
+		// One-to-many relationship
+		myTests	: [{
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}],
+
+		// One-to-one relationship
+		lastUsed	: {
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}
+	}),
+
+	auth(req, res, next) {
+		// Allow access for user
+	    if (req.user) return next()
+
+		// Deny access for everyone else
+	    next(new Error("You are not logged in"))
+	},
+
+	// CRUD operations. Remove to disable.
+	find	: {}
+})
 ```
 
-## Customising the business logic
+Let's make it a bit more complex. What if you want to be publicly readable, but only writable for a user, and only deletable by an admin? Simply move the method-specific `auth` function to the method object:
 
-The simplest example of business logic that you might need for these endpoints is the ability to define authentication. Here is a simple example that restricts all endpoints in this autoroute definition to just be accessible to admins.
+```js
+function auth(req, res, next) {
+	// Allow access for user
+	if (req.user) return next()
 
-```javascript
-const autorouteJson = require('express-autoroute-json');
-const { models } = require('../../../models');
-
-function isAdmin(req, res, next) {
-    //deny access if the user is not admin
-    if (!req.user || !req.user.isAdmin) {
-        return res.status(401).send("You are not an admin");
-    }
-    next();
+	// Deny access for everyone else
+	next(new Error("You are not logged in"))
 }
 
-module.exports.autoroute = autorouteJson({
-  model: models.example,
-  resource: 'example',
+module.exports = ({mongoose}) => ({
+	schema	: new mongoose.Schema({
+		name	: String,
+		email	: String,
 
-  // defining authentication here auto-applies it to all endpoints in this autoroute definition
-  authentication: isAdmin,
+		// One-to-many relationship
+		myTests	: [{
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}],
 
-  find: {},
-  create: {},
-  update: {},
-  delete: {},
-});
+		// One-to-one relationship
+		lastUsed	: {
+			type	: mongoose.Schema.Types.ObjectId,
+			ref		: 'Test'
+		}
+	}),
+
+	// CRUD operations. Remove to disable.
+	find	: {},
+	create	: {
+		auth
+	},
+	update	: {
+		auth
+	},
+	delete	: {
+		auth(req, res, next) {
+			// Allow access for admin
+			if (req.user && req.user.isAdmin) return next()
+
+			// Deny access for everyone else
+			next(new Error("You do not have administrator privileges"))
+		}
+	}
+})
 ```
 
-If you wanted to make it so that only admins are allowed to create, update or delete resources but **everyone** is able to retrieve resources then we can define authentication on each action block independently:
+### Select
 
-```javascript
-const autorouteJson = require('express-autoroute-json');
-const { models } = require('../../../models');
+_To do_
 
-function isAdmin(req, res, next) {
-    if (!req.user || !req.user.isAdmin) {
-        return res.status(401).send("You are not an admin");
-    }
-    next();
-}
+## JSON:API support
 
-module.exports.autoroute = autorouteJson({
-  model: models.example,
-  resource: 'example',
+_To do_
 
-  find: {},
-  create: {
-    authentication: isAdmin,
-  },
-  update: {
-    authentication: isAdmin,
-  },
-  delete: {
-    authentication: isAdmin,
-  },
-});
-```
+### Sort
 
-## Further Documentation
+_To do_
 
-We are in the process of developing some more in-depth documentation (including courses) as part of the [Authmaker](https://authmaker.com) Curriculum. As I said above you **do not** need to use Authmaker if you want to to use express-autoroute-json, however the current [Authmaker documentation](https://beginner-guides.authmaker.com/current/index) is the most complete documentation of using this entire system in a full-stack application.
+### Filter
 
-There is a tiny bit more documentation on the [wiki](https://github.com/stonecircle/express-autoroute-json/wiki) but if you have any questions or want to request some specific documentation you can reach out to me [on Twitter](https://twitter.com/real_ate)
+_To do_
+
+### Fields
+
+_To do_
+
+### Include
+
+At the moment, includes work one level deep.
 
 # Licence
-Copyright (c) 2019, Redsandro Media <info@redsandro.com>
+
+Copyright (c) 2018 - 2019, Redsandro Media <info@redsandro.com>
 Copyright (c) 2018, Stone Circle <info@stonecircle.ie>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
