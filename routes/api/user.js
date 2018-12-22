@@ -14,7 +14,7 @@ module.exports = ({mongoose}) => ({
 	}),
 
 	create	: {},
-	find	: {},	//TODO: Rename to read
+	find	: {},
 	update	: {},
 	delete	: {}
 })
