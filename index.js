@@ -26,7 +26,7 @@ module.exports = async(args = {}) => {
 	const files		= await recursive(routes, [(file, stats) => stats.isFile() && file.substr(-3) !== '.js'])
 
 	files.forEach(file => {
-		const prefix		= path.dirname(file.replace(routes, ''))
+		const prefix		= path.dirname(file.replace(routes, '')).replace(/^\/$/, '')
 		const type			= path.basename(file, '.js').replace(/^\w/, c => c.toUpperCase())
 		const routeOptions	= require(file)({mongoose})
 
