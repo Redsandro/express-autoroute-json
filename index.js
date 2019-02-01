@@ -19,23 +19,23 @@ const methodMap		= {
 global.get = (obj, path, fallback) => path.split('.').every(el => ((obj = obj[el]) !== undefined)) ? obj : fallback
 
 module.exports = async(args = {}) => {
-	const logger	= getLogger(args)
-	const mongoose	= await getMongoose(args)
-	const app		= getApp(args)
-	const routes	= getRoutes(args)
-	const files		= await recursive(routes, [(file, stats) => stats.isFile() && file.substr(-3) !== '.js'])
+	const logger		= getLogger(args)
+	const mongoose		= await getMongoose(args)
+	const app			= getApp(args)
+	const routes		= getRoutes(args)
+	const files			= await recursive(routes, [(file, stats) => stats.isFile() && file.substr(-3) !== '.js'])
 
 	files.forEach(file => {
 		const prefix		= path.dirname(file.replace(routes, '')).replace(/^\/$/, '')
 		const type			= path.basename(file, '.js').replace(/^\w/, c => c.toUpperCase())
-		const routeOptions	= require(file)({mongoose})
+		const route			= require(file)({mongoose})
+		const model			= mongoose.model(type, route.schema)
+		const options		= { model, args, ...route }
+		const crud			= routeMapper(options)
 
-		routeOptions.model	= mongoose.model(type, routeOptions.schema)
-		const route			= routeMapper(routeOptions)
-
-		for (const method in route) {
-			for (const path in route[method]) {
-				app[method].apply(app, [`${prefix}${path}`].concat(route[method][path]))
+		for (const method in crud) {
+			for (const path in crud[method]) {
+				app[method].apply(app, [`${prefix}${path}`].concat(crud[method][path]))
 				logger.info(`Added [${methodMap[method]}] ${prefix}${path}`)
 			}
 		}
@@ -76,7 +76,7 @@ async function getMongoose(args) {
 
 async function connectMongoose(args, retryDelay = 1) {
 	try {
-		await args.mongoose.connect('mongodb://localhost/jsonapi-server-mini', { useNewUrlParser: true })
+		await args.mongoose.connect(args.mongoUri || 'mongodb://localhost/jsonapi-server-mini', { useNewUrlParser: true })
 		return args.mongoose
 	}
 	catch(err) {
