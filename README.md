@@ -1,12 +1,12 @@
 # jsonapi-server-mini
 
-Super easy node/mongo CRUD backend for JSON:API consuming apps like Ember.
+Super easy Node.js + MongoDB CRUD backend for JSON:API consuming apps like Ember.
 
-`jsonapi-server-mini` allows you to quickly write an [ExpressJS](https://expressjs.com/) [JSON:API](https://jsonapi.org) server. Adhering to [_Convention Over Configuration_](https://en.wikipedia.org/wiki/Convention_over_configuration). Your endpoints should have zero boilerplate code, and only contain your business logic.
+`jsonapi-server-mini` allows you to quickly write an [ExpressJS](https://expressjs.com/) [JSON:API](https://jsonapi.org) server. Adhering to [_Convention Over Configuration_](https://en.wikipedia.org/wiki/Convention_over_configuration), your endpoints should have zero boilerplate code, and only contain your business logic.
 
-This module attempts to be as simple as possible, yet still be fully compliant with JSON:API. That means we should be able to do things like `sort`, `filter`, `page`, `include`, pretty much everything you need to write a descent app.
+## Scope
 
-On the other hand, there won't be any custom complexity. One route means one type, one model, one schema. If you want something crazy, like a custom type that uses six models and a hard-coded joke about Belgians, you should look for a heavier solution, such as the ones listed below:
+This module attempts to be a simplistic lightweight yet complete JSON:API endpoint. There should be out-of-the-box support for all basic JSON:API features you need to write a descent app, like `sort`, `filter`, `page` and `include`. Routes are limited to one type, one model, one schema. If you want something crazy, like a custom type that uses six models and a hard-coded joke about Belgians, you should look for a more advanced solution, such as the ones listed below:
 
 * [Fortune.js](http://fortune.js.org/) with [fortune-json-api](https://github.com/fortunejs/fortune-json-api)
 * [jsonapi-server](https://github.com/holidayextras/jsonapi-server) (no longer maintained)
@@ -34,7 +34,7 @@ The module contains everything to get up and running. Even test routes `/tests` 
 mkdir jsonapi-server-mini && cd $_
 npm init -y
 npm install --save jsonapi-server-mini
-echo "require('../')()" > index.js
+echo "require('jsonapi-server-mini')()" > index.js
 node .
 ```
 
@@ -97,19 +97,88 @@ module.exports = ({mongoose}) => ({
 })
 ```
 
-You should create your own routes in your app's `routes` directory. You'll need to specify the full path to your own `routes` directory.
+### Our first app
+
+You should create your own routes in your app's `routes` directory. You'll need to specify the full path to your own `routes` directory. Now let's create our first fully working app:
 
 `index.js`:
 ```js
 const path = require('path')
-const jserve = require('jsonapi-server-mini')
+const jsMini = require('jsonapi-server-mini')
 
-jserve({
+jsMini({
 	routes: path.join(__dirname, 'routes')
 })
 ```
 
 Any sub-directory will be appended to the route in case you want `/api/v1`, `/api/v2` etc. The filename (in singular form) decides the resource type and schema name (in plural form). Go ahead and copy the file, adding something crazy to the schema!
+
+### Module options
+
+When starting **jsonapi-server-mini**, we can provide an `options` _Object_ like so: `jsMini(options)`. Every option is, well, optional. But it makes sense to at least define your own routes, and specify the path to them using `routes`.
+
+* `app` _Router_ Express router
+* `authn` _function_ Basic first-line authentication
+* `limit` _Number_ Global limit for `find` queries. **Default:** `50`
+* `logger` _Module_ **Default:** `winston` console logger
+* `meta` _Object_ Static metadata to append to every JSON:API response. E.g. server version information.
+* `mongoose` _Module_ in case you want to re-use an existing instance.
+* `mongoUri` _String_ MongoDB connection string
+* `routes` _String_ Path to custom routes
+
+#### `app`
+
+If you want to use your own _Express Router_ so you can add different (non-JSON:API) endpoints to your app, you can do so, but you'll need to enable some basic parsing for `jsonapi-server-mini` to work on requests:
+
+* Handle CORS
+* Decode `urlencoded` requests
+* Parse body for `application/vnd.api+json` mimetype
+
+Here is an example:
+
+`index.js`:
+```js
+const path = require('path')
+const express = require('express')
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const cors 	= require('cors')
+const jsMini = require('jsonapi-server-mini')
+
+const app = new express.Router()
+const routes = path.join(__dirname, 'routes')
+
+app.use(cors())
+	.use(bodyParser.urlencoded({ extended: true }))
+	.use(bodyParser.json({ type: 'application/vnd.api+json' }))
+
+express()
+	.use(morgan('combined'))
+	.use('/jsonapi', app) // jsonapi-server-mini endpoint
+	.get('/', (req, res) => res.json({ hello: 'world' })) // custom endpoint
+	.listen(4488)
+
+jsMini({ app, routes })
+```
+
+#### `authn`
+
+_To do_
+
+#### `mongoUri`
+
+If you are not running an authless MongoDB server on localhost, you need to provide a MongoDB connection string. E.g.:
+
+```js
+jsMini({
+	mongoUri: 'mongodb://user:password@hostname/database'
+})
+```
+
+### .......... Route options
+
+* `schema` _Schema_ A Mongoose Schema
+* `description`
 
 ### Schema
 
@@ -251,6 +320,21 @@ _To do_
 ### Include
 
 At the moment, includes work one level deep.
+
+# Contributing
+
+We like to keep the scope of this module very small and easy to maintain in order to allow for quickly building small yet descent apps. Any pull request that adds complexity not part of the JSON:API spec will be rejected.
+
+## Running tests
+
+Stop anything running on port `27017`, and start an authless mongo database using `docker`:
+
+```bash
+npm run start-docker
+```
+
+_To do_
+
 
 # Licence
 
