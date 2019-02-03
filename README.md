@@ -120,6 +120,7 @@ When starting **jsonapi-server-mini**, we can provide an `options` _Object_ like
 * `app` _Router_ Express router
 * `authn` _function_ Basic first-line authentication
 * `limit` _Number_ Global limit for `find` queries. **Default:** `50`
+* `limitMax` _Number_ Maximum query string limit override. **Default:** `100`
 * `logger` _Module_ **Default:** `winston` console logger
 * `meta` _Object_ Static metadata to append to every JSON:API response. E.g. server version information.
 * `mongoose` _Module_ in case you want to re-use an existing instance.
