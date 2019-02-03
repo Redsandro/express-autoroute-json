@@ -47,6 +47,7 @@
     "winston": "^3.1.0"
   },
   "dependencies": {
+    "camelcase": "^5.0.0",
     "camelcase-keys": "^5.0.0",
     "cors": "^2.8.5",
     "express-autoroute": "^2.1.0",
