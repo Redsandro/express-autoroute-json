@@ -1,3 +1,5 @@
 const jserve = require('../')
 
-jserve()
+jserve({
+	routes: '/var/www/lib/nodejs/modules/express-autoroute-json/test/fixtures/create'
+})

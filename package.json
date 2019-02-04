@@ -13,6 +13,7 @@
     "start-docker": "docker run -d -p 27017:27017 --rm --name jsonapi-server-mini-mongo mongo",
     "stop-docker": "docker stop jsonapi-server-mini-mongo",
     "test-watch": "NODE_ENV=test mocha --recursive -w --reporter min",
+    "test-mocha": "NODE_ENV=test mocha --recursive test",
     "test-single": "NODE_ENV=test mocha test/actions/create.js",
     "test": "NODE_ENV=test nyc -a mocha --recursive test"
   },
