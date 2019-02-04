@@ -16,6 +16,8 @@ const methodMap		= {
 	delete	: '   D'
 }
 
+const testEnv		= process.env.NODE_ENV == 'test'
+
 global.get = (obj, path, fallback) => path.split('.').every(el => ((obj = obj[el]) !== undefined)) ? obj : fallback
 
 module.exports = async(args = {}) => {
@@ -30,7 +32,8 @@ module.exports = async(args = {}) => {
 		const type			= path.basename(file, '.js').replace(/^\w/, c => c.toUpperCase())
 		const route			= require(file)({mongoose})
 		const model			= mongoose.model(type, route.schema)
-		const options		= { model, args, ...route }
+		const relationships	= getRefs(route.schema)
+		const options		= { model, args, relationships, ...route }
 		const crud			= routeMapper(options)
 
 		for (const method in crud) {
@@ -53,7 +56,8 @@ module.exports = async(args = {}) => {
 function getLogger(args) {
 	if (!args.logger || typeof get(args, 'logger.debug') !== 'function' || typeof get(args, 'logger.info') !== 'function') {
 		args.logger = require('winston')
-		args.logger.add(new args.logger.transports.Console())
+		const level = testEnv ? 'emerg' : 'info'
+		args.logger.add(new args.logger.transports.Console({level}))
 		args.logger.debug('Added default logger. You can specify your own winston instance using the `logger` attribute.')
 	}
 
@@ -98,7 +102,7 @@ function getApp(args) {
 		args.logger.debug('Added default express.')
 
 		return require('express')()
-			.use(morgan('dev'))
+			.use(testEnv ? (req, res, next) => next() : morgan('dev'))
 			.use(cors())
 			.use(bodyParser.urlencoded({extended: true}))
 			.use(bodyParser.json({type: 'application/vnd.api+json'}))
@@ -116,4 +120,18 @@ function getRoutes(args) {
 	}
 
 	return args.routes
+}
+
+/**
+ * Get refs/relationships from schema
+ * @param  {[type]} schema [description]
+ * @return {[type]}        [description]
+ */
+function getRefs(schema) {
+	return Object.entries(schema.paths).reduce((acc, [key, val]) => {
+		const options	= get(val, 'options', {})
+		const type		= get(options, 'ref') || get(options, 'type.0.ref')
+		if (type) acc[key] = type
+		return acc
+	}, {})
 }
