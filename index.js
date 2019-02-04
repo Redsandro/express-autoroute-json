@@ -41,7 +41,9 @@ module.exports = async(args = {}) => {
 		}
 	})
 
-	if (!args.app) app.listen(8888)
+	if (!args.app) app.listen(args.port || 8888)
+
+	return app
 }
 
 /**
