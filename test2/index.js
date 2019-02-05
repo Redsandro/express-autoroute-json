@@ -1,5 +1,6 @@
+const path = require('path')
 const jserve = require('../')
 
 jserve({
-	routes: '/var/www/lib/nodejs/modules/express-autoroute-json/test/fixtures/create'
+	routes: path.join(__dirname, '../test/fixtures/create')
 })

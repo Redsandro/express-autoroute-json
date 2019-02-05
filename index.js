@@ -8,6 +8,7 @@ const recursive		= require('recursive-readdir')
 const bodyParser	= require('body-parser')
 const cors			= require('cors')
 const morgan		= require('morgan')
+const JSONAPIError	= require('jsonapi-serializer').Error
 
 const methodMap		= {
 	post	: 'C   ',
@@ -42,6 +43,31 @@ module.exports = async(args = {}) => {
 				logger.info(`Added [${methodMap[method]}] ${prefix}${path}`)
 			}
 		}
+	})
+
+	// Path does not exist
+	app.use((req, res, next) => {
+		res.status(404).json(new JSONAPIError({
+			status	: '404',
+			title	: 'Not Found',
+			detail	: `Cannot ${req.method} ${req.url}`,
+			source	: {
+				pointer	: req.originalUrl
+			}
+		}))
+		next()
+	})
+
+	// An error was thrown
+	app.all((err, req, res, next) => {
+		res.status(500).json(new JSONAPIError({
+			status	: '500',
+			title	: 'Internal Server Error',
+			details	: err.message,
+			source	: {
+				pointer	: req.originalUrl
+			}
+		}))
 	})
 
 	if (!args.app) app.listen(args.port || 8888)
