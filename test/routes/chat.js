@@ -5,5 +5,6 @@ module.exports = ({mongoose}) => ({
 	}),
 
 	create	: {},
-	find	: {}
+	find	: {},
+	delete	: {}
 })

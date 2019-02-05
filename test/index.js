@@ -11,6 +11,8 @@ global.validateJSONAPI = function(res) {
 	const result = validator.validate(res.body, require('./schema.json'))
 
 	if (!result.valid) {
+		console.log(res.text)
+		console.log('%j', res.body)
 		throw new Error(result.errors)
 	}
 
