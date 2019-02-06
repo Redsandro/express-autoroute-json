@@ -33,6 +33,7 @@ module.exports = async(args = {}) => {
 		const type			= path.basename(file, '.js').replace(/^\w/, c => c.toUpperCase())
 		const route			= require(file)({mongoose})
 		const model			= mongoose.model(type, route.schema)
+		const indexes		= route.indexes
 		const relationships	= getRefs(route.schema)
 		const options		= { model, args, relationships, ...route }
 		const crud			= routeMapper(options)
@@ -42,6 +43,12 @@ module.exports = async(args = {}) => {
 				app[method].apply(app, [`${prefix}${path}`].concat(crud[method][path]))
 				logger.info(`Added [${methodMap[method]}] ${prefix}${path}`)
 			}
+		}
+
+		//FIXME: While nice for development, it is recommended this behavior be disabled in production.
+		if (indexes) {
+			route.schema.index(route.indexes)
+			model.createIndexes(err => err && logger.error(err.message))
 		}
 	})
 
