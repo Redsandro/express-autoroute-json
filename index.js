@@ -47,19 +47,23 @@ module.exports = async(args = {}) => {
 
 	// Path does not exist
 	app.use((req, res, next) => {
-		res.status(404).json(new JSONAPIError({
-			status	: '404',
-			title	: 'Not Found',
-			detail	: `Cannot ${req.method} ${req.url}`,
-			source	: {
-				pointer	: req.originalUrl
-			}
-		}))
+		if (!res.headersSent) {
+			res.status(404).json(new JSONAPIError({
+				status	: '404',
+				title	: 'Not Found',
+				detail	: `Cannot ${req.method} ${req.url}`,
+				source	: {
+					pointer	: req.originalUrl
+				}
+			}))
+		}
 		next()
 	})
 
 	// An error was thrown
 	app.all((err, req, res, next) => {
+		if (res.headersSent) return next(err)
+
 		res.status(500).json(new JSONAPIError({
 			status	: '500',
 			title	: 'Internal Server Error',
