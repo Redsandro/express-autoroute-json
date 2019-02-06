@@ -99,9 +99,12 @@ async function getMongoose(args) {
 		args.mongoose = require('mongoose')
 		//TODO: Connect separately in case mongoose was specified by user but not connected to
 		// while (args.mongoose.connection.readyState !== 1)
-		await connectMongoose(args)
+		// await connectMongoose(args)
 		args.logger.debug('Added default mongoose. You can specify your own mongoose instance using the `mongoose` attribute.')
 	}
+
+	while (args.mongoose.connection.readyState !== 1)
+		await connectMongoose(args)
 
 	return args.mongoose
 }
