@@ -17,7 +17,7 @@ describe('Creating Relationships', function() {
 				data: {
 					type: 'people',
 					attributes: {
-						name: 'namey mc nameface',
+						name: 'Redsandro',
 						age: 29,
 					},
 					relationships: {
@@ -33,7 +33,7 @@ describe('Creating Relationships', function() {
 			.then(res => {
 				res.should.have.status(201)
 				res.body.should.have.nested.property('data.id')
-				res.body.should.have.nested.property('data.attributes.name', 'namey mc nameface')
+				res.body.should.have.nested.property('data.attributes.name', 'Redsandro')
 				res.body.should.have.nested.property('data.relationships.spouse.data.id', spouseId.toString())
 
 				return global.validateJSONAPI(res)
@@ -50,7 +50,7 @@ describe('Creating Relationships', function() {
 				data: {
 					type: 'people',
 					attributes: {
-						name: 'namey mc nameface',
+						name: 'Redsandro',
 						age: 29,
 					},
 					relationships: {
@@ -70,7 +70,7 @@ describe('Creating Relationships', function() {
 				const {body, body:{data: {relationships}} } = res
 				res.should.have.status(201)
 				body.should.have.nested.property('data.id')
-				body.should.have.nested.property('data.attributes.name', 'namey mc nameface')
+				body.should.have.nested.property('data.attributes.name', 'Redsandro')
 				relationships.pets.data.should.deep.include({
 					type: 'animals',
 					id: dogId.toString(),
@@ -93,7 +93,7 @@ describe('Creating Relationships', function() {
 				data: {
 					type: 'people',
 					attributes: {
-						name: 'namey mc nameface',
+						name: 'Redsandro',
 						age: 29,
 					},
 					relationships: {
@@ -129,7 +129,7 @@ describe('Creating Relationships', function() {
 				data: {
 					type: 'people',
 					attributes: {
-						name: 'namey mc nameface',
+						name: 'Redsandro',
 						age: 29,
 					},
 				},
@@ -140,7 +140,7 @@ describe('Creating Relationships', function() {
 				res.should.have.status(201)
 				body.should.have.nested.property('data.id')
 				body.should.deep.nested.include({
-					'data.attributes.name': 'namey mc nameface',
+					'data.attributes.name': 'Redsandro',
 					'data.relationships.spouse.data': null,
 					'data.relationships.pets.data': []
 				})
@@ -159,7 +159,7 @@ describe('Creating Relationships', function() {
 				data: {
 					type: 'people',
 					attributes: {
-						name: 'namey mc nameface',
+						name: 'Redsandro',
 						age: 29,
 					},
 					relationships: {
@@ -177,7 +177,7 @@ describe('Creating Relationships', function() {
 				body.should.have.nested.property('data.id')
 				body.should.not.have.deep.property('data.relationships.monkeyface')
 				body.should.deep.nested.include({
-					'data.attributes.name': 'namey mc nameface',
+					'data.attributes.name': 'Redsandro',
 					'data.relationships.spouse.data': null,
 					'data.relationships.pets.data': []
 				})
