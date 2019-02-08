@@ -94,6 +94,17 @@ describe('Filtering Resources', function() {
 				res.body.data.should.have.lengthOf(5)
 			})
 	})
+	it('should filter multiple "not" (!2,3,4)', async function() {
+		return chai.request(await global.app)
+			.get('/people')
+			.query({ filter: {
+				age: '!1,3,4,6'
+			}})
+			.then(res => {
+				res.should.have.status(200)
+				res.body.data.should.have.lengthOf(2)
+			})
+	})
 	it('should filter "like" (:)', async function() {
 		return chai.request(await global.app)
 			.get('/people')
