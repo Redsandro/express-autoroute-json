@@ -209,17 +209,22 @@ describe('Updating Relationships', function() {
 			.type('application/vnd.api+json')
 			.send({ data: {
 				type: 'people',
+				attributes: {
+					age: 49
+				},
 				relationships: {
-					pets: [],
+					pets: {
+						data: []
+					},
 				}
 			}})
 			.then(res => {
 				res.should.have.status(200)
 				res.body.should.nested.include({
 					'data.attributes.name': 'Youngster',
-					'data.attributes.age': 2,
+					'data.attributes.age': 49,
 				})
-				expect(res.body.data.relationships.pets.data[0]).to.have.property('id', newId.toString())
+				expect(res.body.data.relationships.pets.data).to.be.empty
 				return res
 			})
 	})
