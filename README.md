@@ -143,7 +143,7 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
-const cors 	= require('cors')
+const cors = require('cors')
 const jsMini = require('jsonapi-server-mini')
 
 const app = new express.Router()
@@ -176,10 +176,17 @@ jsMini({
 })
 ```
 
-### .......... Route options
+### Route options
 
 * `schema` _Schema_ A Mongoose Schema
-* `description`
+* `description` _To do_
+* `indexes` _To do_
+
+### CRUD method options
+
+* `authn` _function(req, res, next) -> Callback_ _To do_
+* `authz` _function(req) -> Object_ _To do_
+* `find.query` _To do_
 
 ### Schema
 
@@ -215,7 +222,7 @@ The comment says it all. You can remove them to disable them, or add route-speci
 
 ### Authentication
 
-Once you've written some custom authentication logic, you can create an _Express Middleware_ function `auth` to either continue or throw an error. The same authentication applies to all CRUD methods.
+Once you've written some custom authentication logic, you can create an _Express Middleware_ function `authn` to either continue or throw an error. The same authentication applies to all CRUD methods.
 
 ```js
 module.exports = ({mongoose}) => ({
@@ -236,7 +243,7 @@ module.exports = ({mongoose}) => ({
 		}
 	}),
 
-	auth(req, res, next) {
+	authn(req, res, next) {
 		// Allow access for user
 	    if (req.user) return next()
 
@@ -252,7 +259,7 @@ module.exports = ({mongoose}) => ({
 Let's make it a bit more complex. What if you want to be publicly readable, but only writable for a user, and only deletable by an admin? Simply move the method-specific `auth` function to the method object:
 
 ```js
-function auth(req, res, next) {
+function authn(req, res, next) {
 	// Allow access for user
 	if (req.user) return next()
 
@@ -281,13 +288,13 @@ module.exports = ({mongoose}) => ({
 	// CRUD operations. Remove to disable.
 	find	: {},
 	create	: {
-		auth
+		authn
 	},
 	update	: {
-		auth
+		authn
 	},
 	delete	: {
-		auth(req, res, next) {
+		authn(req, res, next) {
 			// Allow access for admin
 			if (req.user && req.user.isAdmin) return next()
 
@@ -297,6 +304,12 @@ module.exports = ({mongoose}) => ({
 	}
 })
 ```
+
+### Authorization
+
+`authz`
+
+__To do__
 
 ### Select
 
@@ -334,13 +347,24 @@ Stop anything running on port `27017`, and start an authless mongo database usin
 npm run start-docker
 ```
 
-_To do_
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run mocha:
+
+```bash
+npm run test-mocha
+```
 
 
 # Licence
 
 Copyright (c) 2018 - 2019, Redsandro Media <info@redsandro.com>
-Copyright (c) 2018, Stone Circle <info@stonecircle.ie>
+
+Copyright (c) 2014 - 2018, Stone Circle <info@stonecircle.ie>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
