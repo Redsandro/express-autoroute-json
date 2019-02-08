@@ -45,7 +45,8 @@ module.exports = async(args = {}) => {
 			}
 		}
 
-		//FIXME: While nice for development, it is recommended this behavior be disabled in production.
+		// While nice for development, it is recommended this behavior be disabled in production.
+		// TODO: Let's make this configurable.
 		if (indexes) {
 			route.schema.index(route.indexes)
 			model.createIndexes(err => err && logger.error(err.message))
@@ -105,12 +106,8 @@ function getLogger(args) {
  * Set up default mongoose
  */
 async function getMongoose(args) {
-	//FIXME: Needs catch and retry
 	if (!args.mongoose) {
 		args.mongoose = require('mongoose')
-		//TODO: Connect separately in case mongoose was specified by user but not connected to
-		// while (args.mongoose.connection.readyState !== 1)
-		// await connectMongoose(args)
 		args.logger.debug('Added default mongoose. You can specify your own mongoose instance using the `mongoose` attribute.')
 	}
 
@@ -135,7 +132,7 @@ async function connectMongoose(args, retryDelay = 1) {
 }
 
 /**
- * Set up default express
+ * Set up default express when none was provided
  */
 function getApp(args) {
 	if (!args.app) {
@@ -153,6 +150,7 @@ function getApp(args) {
 
 /**
  * Set up default routes for testing purposes
+ * Or just because it's cool if the app works with zero configuration
  */
 function getRoutes(args) {
 	if (!args.routes) {
@@ -163,9 +161,9 @@ function getRoutes(args) {
 }
 
 /**
- * Get refs/relationships from schema
- * @param  {[type]} schema [description]
- * @return {[type]}        [description]
+ * Get refs/relationships from schema, so that we can have custom id's like Strings
+ * @param  {Schema} schema
+ * @return {Object} Map with relationshipName:idType
  */
 function getRefs(schema) {
 	return Object.entries(schema.paths).reduce((acc, [key, val]) => {
