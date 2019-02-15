@@ -173,8 +173,15 @@ describe('Filtering Resources', function() {
 	it('should filter by array element attribute.0')
 })
 
-describe('Filtering Resources', function() {
+describe('Projecting Fields', function() {
 	it('should select fields from find.fields object')
 	it('should select fields from find.fields function')
 	it('should select fields from query.fields query string')
+})
+
+describe('Sorting Resources', function() {
+	it('should sort by find.sort string')
+	it('should sort by find.sort object')
+	it('should sort by find.sort function')
+	it('should sort by query.sort string')
 })
