@@ -172,3 +172,9 @@ describe('Filtering Resources', function() {
 
 	it('should filter by array element attribute.0')
 })
+
+describe('Filtering Resources', function() {
+	it('should select fields from find.fields object')
+	it('should select fields from find.fields function')
+	it('should select fields from query.fields query string')
+})
