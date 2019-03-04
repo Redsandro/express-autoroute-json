@@ -180,7 +180,46 @@ jsMini({
 
 * `schema` _Schema_ A Mongoose Schema
 * `description` _To do_
-* `indexes` _To do_
+* `indexes` _Object or Array_ Define one or more indexes
+
+#### Indexes
+
+You can define a single compound index that cannot be defined in the schema itself.
+
+```js
+module.exports = ({mongoose}) => ({
+	schema	: new mongoose.Schema({
+		name	: String,
+		group	: { type: String, required: true },
+		friends	: [ { type: String, required: true } ]
+	}),
+
+	indexes	: {
+		group	: 1,
+		friends	: 1
+	},
+
+	// CRUD operations. Remove to disable.
+	find	: {}
+})
+```
+
+Or multiple compound indexes.
+
+```js
+	indexes	: [
+		{
+			group	: 1,
+			friends	: 1
+		},
+		{
+			group	: 1,
+			name	: 1
+		}
+	]
+```
+
+> __Note:__ Although this is useful for development, it's recommended to define indexes manually, so that your application restarts faster.
 
 ### CRUD method options
 

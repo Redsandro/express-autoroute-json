@@ -48,7 +48,7 @@ module.exports = async(args = {}) => {
 		// While nice for development, it is recommended this behavior be disabled in production.
 		// TODO: Let's make this configurable.
 		if (indexes) {
-			route.schema.index(route.indexes)
+			[].concat(route.indexes).forEach(index => route.schema.index(index))
 			model.createIndexes(err => err && logger.error(err.message))
 		}
 	})
