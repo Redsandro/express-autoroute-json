@@ -18,6 +18,8 @@ const methodMap		= {
 }
 
 const testEnv		= process.env.NODE_ENV == 'test'
+const devEnv		= process.env.NODE_ENV == 'development'
+const prodEnv		= process.env.NODE_ENV == 'production'
 
 global.get = (obj, path, fallback) => path.split('.').every(el => ((obj = obj[el]) !== undefined)) ? obj : fallback
 
@@ -41,7 +43,7 @@ module.exports = async(args = {}) => {
 		for (const method in crud) {
 			for (const path in crud[method]) {
 				app[method].apply(app, [`${prefix}${path}`].concat(crud[method][path]))
-				logger.info(`Added [${methodMap[method]}] ${prefix}${path}`)
+				logger.verbose(`Added [${methodMap[method]}] ${prefix}${path}`)
 			}
 		}
 
@@ -94,9 +96,9 @@ module.exports = async(args = {}) => {
 function getLogger(args) {
 	if (!args.logger || typeof get(args, 'logger.debug') !== 'function' || typeof get(args, 'logger.info') !== 'function') {
 		args.logger = require('winston')
-		const level = testEnv ? 'emerg' : 'info'
+		const level = testEnv ? 'emerg' : prodEnv ? 'info' : devEnv ? 'debug' : 'silly'
 		args.logger.add(new args.logger.transports.Console({level}))
-		args.logger.debug('Added default logger. You can specify your own winston instance using the `logger` attribute.')
+		args.logger.verbose('Added default logger. You can specify your own winston instance using the `logger` attribute.')
 	}
 
 	return args.logger
@@ -108,7 +110,7 @@ function getLogger(args) {
 async function getMongoose(args) {
 	if (!args.mongoose) {
 		args.mongoose = require('mongoose')
-		args.logger.debug('Added default mongoose. You can specify your own mongoose instance using the `mongoose` attribute.')
+		args.logger.verbose('Added default mongoose. You can specify your own mongoose instance using the `mongoose` attribute.')
 	}
 
 	while (args.mongoose.connection.readyState !== 1)
@@ -123,7 +125,7 @@ async function connectMongoose(args, retryDelay = 1) {
 		return args.mongoose
 	}
 	catch(err) {
-		args.logger.debug(err.message)
+		args.logger.error(err.message)
 		args.logger.info(`Connection to mongoose failed. Retrying in ${retryDelay} seconds.`)
 		await new Promise(res => setTimeout(res, retryDelay * 1000))
 		if (retryDelay < 60) retryDelay *= 2
@@ -136,7 +138,7 @@ async function connectMongoose(args, retryDelay = 1) {
  */
 function getApp(args) {
 	if (!args.app) {
-		args.logger.debug('Added default express.')
+		args.logger.verbose('Added default express.')
 
 		return require('express')()
 			.use(testEnv ? (req, res, next) => next() : morgan('dev'))
