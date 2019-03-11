@@ -180,7 +180,44 @@ describe('Updating Resources', function() {
 			})
 	})
 
-	it('should convert dasherized patch to camelCase')
+	it('should convert dasherized patch to camelCase', async function() {
+		const p1 = ObjectId()
+		const p2 = ObjectId()
+		await chai.request(await global.app)
+			.post('/people')
+			.type('application/vnd.api+json')
+			.send({ data: {
+				type: 'people',
+				id: p1,
+				attributes: {
+					name: 'Yetti',
+				}
+			}})
+			.then(res => res.should.have.status(201) && res)
+			.then(res => res.body)
+
+		await chai.request(await global.app)
+			.patch(`/people/${p1}`)
+			.type('application/vnd.api+json')
+			.send({ data: {
+				type: 'people',
+				relationships: {
+					'in-law': {
+						data: {
+							type: 'people',
+							id: p2
+						}
+					}
+				}
+			}})
+			.then(res => {
+				res.should.have.status(200)
+			})
+
+		return await Person.findOne({_id: p1}).exec().then(doc => {
+			doc.should.have.deep.property('inLaw', p2)
+		})
+	})
 })
 
 describe('Updating Relationships', function() {
