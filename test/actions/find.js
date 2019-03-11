@@ -69,17 +69,22 @@ describe('Finding Resources', function() {
 			.get('/people')
 			.query({
 				sample: 2,
+				include: 'pets',
 				filter: {
 					name: '~:Thunderhenk'
 				}
 			})
 			.then(res => {
 				const { body } = res
+				console.log('%j', body)
+
 				res.should.have.status(200)
 				body.data.should.have.lengthOf(2)
 				body.should.have.nested.property('meta.count', 2)
 				body.data[0].should.have.property('id')
-				body.data[0].should.have.nested.property('relationships.pets[0].name')
+				body.included.should.have.lengthOf(2)
+				body.should.have.nested.property('included[0].attributes.name')
+				body.included[0].attributes.name.should.match(/^Avogato/)
 			})
 	})
 })
