@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-server-mini",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "description": "Minimalistic JSON:API server for Node.js and MongoDB",
   "main": "index.js",
   "engines": {
@@ -13,10 +13,10 @@
     "start-docker": "docker run -d -p 27017:27017 --rm --name jsonapi-server-mini-mongo mongo",
     "stop-docker": "docker stop jsonapi-server-mini-mongo",
     "test-watch": "NODE_ENV=test mocha --recursive -w --reporter min",
-    "test-mocha": "NODE_ENV=test mocha --recursive test",
+    "test-mocha": "NODE_ENV=test mocha --inspect --recursive test",
     "test-single": "NODE_ENV=test mocha test/actions/create.js",
     "test-nyc": "NODE_ENV=test nyc -a mocha --recursive test",
-    "test": "NODE_ENV=test mocha --recursive test"
+    "test": "NODE_ENV=test mocha --inspect --recursive test"
   },
   "repository": {
     "type": "git",
@@ -52,9 +52,8 @@
     "camelcase": "^5.0.0",
     "camelcase-keys": "^5.0.0",
     "cors": "^2.8.5",
-    "express-autoroute": "^2.1.0",
     "jsonapi-serializer": "^3.6.4",
-    "mongoose": "^5.4.0",
+    "mongoose": "^5.4.15",
     "morgan": "^1.9.1",
     "pluralize": "^7.0.0",
     "recursive-readdir": "^2.2.2",

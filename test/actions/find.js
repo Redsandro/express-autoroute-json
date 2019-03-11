@@ -31,6 +31,7 @@ describe('Finding Resources', function() {
 					]
 				})
 				await person.save()
+				people.push(person._id)
 			}
 		}
 
@@ -85,6 +86,50 @@ describe('Finding Resources', function() {
 				body.included.should.have.lengthOf(2)
 				body.should.have.nested.property('included[0].attributes.name')
 				body.included[0].attributes.name.should.match(/^Avogato/)
+			})
+	})
+
+	it('should return multiple relationships with single document', async function() {
+		return chai.request(await global.app)
+			.get(`/people/${people[0]}`)
+			.query({
+				include: 'pets',
+			})
+			.then(res => {
+				const { body } = res
+
+				res.should.have.status(200)
+				body.data.should.deep.nested.include({type: 'people', id: String(people[0])})
+				body.included.should.have.lengthOf(1)
+				body.should.deep.nested.include({
+					'included[0].type': 'animals',
+					'included[0].id': String(animals[0])
+				})
+				body.included[0].attributes.name.should.match(/^Avogato/)
+			})
+	})
+
+	it('should return multiple relationships with multiple documents', async function() {
+		return chai.request(await global.app)
+			.get('/people')
+			.query({
+				include: 'pets',
+				page: {
+					limit: 3
+				},
+				filter: {
+					name: '~:Thunderhenk'
+				}
+			})
+			.then(res => {
+				const { body } = res
+				console.log('%j', body)
+
+				res.should.have.status(200)
+				body.data.should.have.lengthOf(3)
+				body.included.should.have.lengthOf(3)
+				body.included[0].attributes.name.should.match(/^Avogato/)
+				body.should.have.nested.property('meta.count', 5)
 			})
 	})
 })
