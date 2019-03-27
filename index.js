@@ -126,7 +126,7 @@ async function connectMongoose(args, retryDelay = 1) {
 	}
 	catch(err) {
 		args.logger.error(err.message)
-		args.logger.info(`Connection to mongoose failed. Retrying in ${retryDelay} seconds.`)
+		args.logger.warn(`Connection to mongoose failed. Retrying in ${retryDelay} seconds.`)
 		await new Promise(res => setTimeout(res, retryDelay * 1000))
 		if (retryDelay < 60) retryDelay *= 2
 		return await connectMongoose(args, retryDelay)
