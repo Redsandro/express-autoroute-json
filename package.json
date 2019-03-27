@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-server-mini",
-  "version": "4.0.11",
+  "version": "4.0.12",
   "description": "Minimalistic JSON:API server for Node.js and MongoDB",
   "main": "index.js",
   "engines": {
