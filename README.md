@@ -164,7 +164,7 @@ jsMini({ app, routes })
 
 #### `authn`
 
-_To do_
+* `authn` _function(req, res, next) -> Callback_
 
 #### `mongoUri`
 
@@ -342,6 +342,34 @@ module.exports = ({mongoose}) => ({
 		}
 	}
 })
+```
+
+You may have a global `authn` function in your `jsMini` defenition, but are looking to pass an otherwise rejected authentication. To do this, you can use an upstream `authn` function to set a variable that you will check downstream.
+
+`someRoute.js`:
+```js
+module.exports = ({mongoose}) => ({
+	description	: 'This route will override global authn',
+	schema		: , // ...
+
+	authn(req, res, next) {
+		req.locals.authenticated = true
+
+		return next()
+	},
+
+	find	: { // ...
+```
+
+`index.js`:
+```js
+const jsMini = require('jsonapi-server-mini')
+
+function authn() {
+	if (res.locals.authenticated === true) return next() // Granted elsewhere
+}
+
+jsMini({ authn })
 ```
 
 ### Authorization
