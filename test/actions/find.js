@@ -77,7 +77,7 @@ describe('Finding Resources', function() {
 			})
 			.then(res => {
 				const { body } = res
-				console.log('%j', body)
+				// console.log('%j', body)
 
 				res.should.have.status(200)
 				body.data.should.have.lengthOf(2)
@@ -123,7 +123,7 @@ describe('Finding Resources', function() {
 			})
 			.then(res => {
 				const { body } = res
-				console.log('%j', body)
+				// console.log('%j', body)
 
 				res.should.have.status(200)
 				body.data.should.have.lengthOf(3)

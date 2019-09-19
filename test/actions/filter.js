@@ -8,14 +8,16 @@ chai.should()
 chai.use(chaiHttp)
 
 describe('Filtering Resources', function() {
-	let dog, cat, Animal, Person
+	let dog, cat, Animal, Person, Project
 	before('Set up database', async function() {
 		if (process.env.NODE_ENV === 'test') {
 			Animal	= mongoose.model('Animal')
 			Person	= mongoose.model('Person')
+			Project	= mongoose.model('Project')
 
 			await Animal.deleteMany({})
 			await Person.deleteMany({})
+			await Project.deleteMany({})
 
 			dog		= new Animal({name: 'Dogmeat'})
 			cat		= new Animal({name: 'Tiger'})
@@ -33,6 +35,15 @@ describe('Filtering Resources', function() {
 				})
 				await person.save()
 			}
+
+			(new Project({
+				title		: 'Dog grooming',
+				description	: 'Man plans to groom dogs.',
+			})).save();
+			(new Project({
+				title		: 'Girl pets cat',
+				description	: 'In celebration of cat petting.',
+			})).save()
 		}
 
 		else throw new Error('This is not a testing environment. You will nuke your database.')
@@ -163,6 +174,18 @@ describe('Filtering Resources', function() {
 			.get('/people')
 			.query({ filter: {
 				name: ':~secret.'
+			}})
+			.then(res => {
+				res.should.have.status(200)
+				res.body.data.should.have.lengthOf(1)
+			})
+	})
+
+	it('should filter by $text $search', async function() {
+		return chai.request(await global.app)
+			.get('/projects')
+			.query({ filter: {
+				$text: 'dog'
 			}})
 			.then(res => {
 				res.should.have.status(200)

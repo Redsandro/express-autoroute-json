@@ -8,6 +8,11 @@ module.exports = ({mongoose}) => ({
 		isActive	: Boolean
 	}),
 
+	indexes	: {
+		title		: 'text',
+		description	: 'text'
+	},
+
 	create	: {},
 	find	: {}
 })
