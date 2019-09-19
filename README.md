@@ -402,6 +402,50 @@ _To do_
 
 At the moment, includes work one level deep.
 
+### Advanced
+
+#### Middleware
+
+Perhaps you're trying to do something slightly more complicated, but you are not ready for [Fortune.js](http://fortune.js.org/) yet. You might benefit from using a custom middleware function right before your query is executed. You can specify this function on multiple levels. The CRUD level, the route level, and the global level (when initializing `jsMini`).
+
+```js
+module.exports = ({mongoose}) => ({
+	// ...
+
+	middleware(req, res, next) {
+		// Executed before _every_ crud operation on this route
+		return next()
+	},
+
+	find	: {
+		middleware(req, res, next) {
+			// Executed before every _find_ operation on this route
+			return next()
+```
+
+#### Shortcut middleware
+
+Often you'll just want to pre-fill the query (i.e. `req.jsMini.query`) with a non-async object-returning function, similar to `authz`. You can suffice with a single `req` parameter:
+
+```js
+	middleware(req) {
+		return {
+			customFilter: 'presetValue'
+		}
+	},
+```
+
+#### Pre- and post middleware
+
+If you want to use a middleware function to execute _after_ the query has been done, you can make `middleware` an object with a (`pre` and/or) `post` function:
+
+```js
+	middleware {
+		pre(req, res, next) { /* ... */ },
+		post(req, res, next) { /* ... */ }
+	},
+```
+
 # Contributing
 
 We like to keep the scope of this module very small and easy to maintain in order to allow for quickly building small yet descent apps. Any pull request that adds complexity not part of the JSON:API spec will be rejected.

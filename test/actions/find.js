@@ -132,4 +132,8 @@ describe('Finding Resources', function() {
 				body.should.have.nested.property('meta.count', 5)
 			})
 	})
+
+	it('should execute pre-middleware')
+
+	it('should execute post-middleware')
 })
