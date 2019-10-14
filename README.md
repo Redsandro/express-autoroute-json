@@ -6,7 +6,7 @@ Super easy Node.js + MongoDB CRUD backend for JSON:API consuming apps like Ember
 
 ## Scope
 
-This module attempts to be a simplistic lightweight yet complete JSON:API endpoint. There should be out-of-the-box support for all basic JSON:API features you need to write a descent app, like `sort`, `filter`, `page` and `include`. Routes are limited to one type, one model, one schema. If you want something crazy, like a custom type that uses six models and a hard-coded joke about Belgians, you should look for a more advanced solution, such as the ones listed below:
+This module attempts to be a simplistic lightweight yet complete JSON:API endpoint. There should be out-of-the-box support for all basic JSON:API features you need to write a decent app, like `sort`, `filter`, `page` and `include`. Routes are limited to one type, one model, one schema. If you want something crazy, like a custom type that uses six models and a hard-coded joke about Belgians, you should look for a more advanced solution, such as the ones listed below:
 
 * [Fortune.js](http://fortune.js.org/) with [fortune-json-api](https://github.com/fortunejs/fortune-json-api)
 * [jsonapi-server](https://github.com/holidayextras/jsonapi-server) (no longer maintained)
@@ -533,7 +533,7 @@ If you want to use a middleware function to execute _after_ the query has been d
 
 # Contributing
 
-We like to keep the scope of this module very small and easy to maintain in order to allow for quickly building small yet descent apps. Any pull request that adds complexity not part of the JSON:API spec will be rejected.
+We like to keep the scope of this module very small and easy to maintain in order to allow for quickly building small yet decent apps. Any pull request that adds complexity not part of the JSON:API spec will be rejected.
 
 ## Running tests
 
