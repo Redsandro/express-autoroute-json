@@ -42,16 +42,16 @@ Bam! We're running a server. Let's create a user
 
 ```bash
 curl -X POST http://localhost:8888/api/users \
-	-H 'Content-Type: application/vnd.api+json' \
-	-d @- <<'EOF'
+    -H 'Content-Type: application/vnd.api+json' \
+    -d @- <<'EOF'
 {
-	"data": {
-		"type": "users",
-		"attributes": {
-			"name": "Some User",
-			"email": "test@example.com"
-		}
-	}
+  "data": {
+    "type": "users",
+    "attributes": {
+      "name": "Some User",
+      "email": "test@example.com"
+    }
+  }
 }
 EOF
 ```
@@ -80,20 +80,20 @@ Response:
 
 ## Route definitions
 
-The above `/api/users` example works because you haven't defined your own resources. The fallback from `node_modules/jsonapi-server-mini/routes/api/user.js` is loaded:
+The above `/api/users` example route is active because you haven't defined your own resources. The fallback from `node_modules/jsonapi-server-mini/routes/api/user.js` is loaded:
 
 ```js
 module.exports = ({mongoose}) => ({
-	schema	: new mongoose.Schema({
-		name	: String,
-		email	: String
-	}),
+    schema      : new mongoose.Schema({
+        name        : String,
+        email       : String
+    }),
 
-	// CRUD operations. Remove to disable.
-	find	: {},
-	create	: {},
-	update	: {},
-	delete	: {}
+    // CRUD operations. Remove to disable.
+    find        : {},
+    create      : {},
+    update      : {},
+    delete      : {}
 })
 ```
 
@@ -103,11 +103,11 @@ You should create your own routes in your app's `routes` directory. You'll need 
 
 `index.js`:
 ```js
-const path = require('path')
-const jsMini = require('jsonapi-server-mini')
+const path      = require('path')
+const jsMini    = require('jsonapi-server-mini')
 
 jsMini({
-	routes: path.join(__dirname, 'routes')
+    routes: path.join(__dirname, 'routes')
 })
 ```
 
@@ -139,25 +139,25 @@ Here is an example:
 
 `index.js`:
 ```js
-const path = require('path')
-const express = require('express')
-const bodyParser = require('body-parser')
-const morgan = require('morgan')
-const cors = require('cors')
-const jsMini = require('jsonapi-server-mini')
+const path      = require('path')
+const express   = require('express')
+const bodyParser= require('body-parser')
+const morgan    = require('morgan')
+const cors      = require('cors')
+const jsMini    = require('jsonapi-server-mini')
 
-const app = new express.Router()
-const routes = path.join(__dirname, 'routes')
+const app       = new express.Router()
+const routes    = path.join(__dirname, 'routes')
 
 app.use(cors())
-	.use(bodyParser.urlencoded({ extended: true }))
-	.use(bodyParser.json({ type: 'application/vnd.api+json' }))
+    .use(bodyParser.urlencoded({ extended: true }))
+    .use(bodyParser.json({ type: 'application/vnd.api+json' }))
 
 express()
-	.use(morgan('combined'))
-	.use('/jsonapi', app) // jsonapi-server-mini endpoint
-	.get('/', (req, res) => res.json({ hello: 'world' })) // custom endpoint
-	.listen(4488)
+    .use(morgan('combined'))
+    .use('/jsonapi', app) // jsonapi-server-mini endpoint
+    .get('/', (req, res) => res.json({ hello: 'world' })) // custom endpoint
+    .listen(4488)
 
 jsMini({ app, routes })
 ```
@@ -172,7 +172,7 @@ If you are not running an authless MongoDB server on localhost, you need to prov
 
 ```js
 jsMini({
-	mongoUri: 'mongodb://user:password@hostname/database'
+    mongoUri: 'mongodb://user:password@hostname/database'
 })
 ```
 
@@ -188,35 +188,35 @@ You can define a single compound index that cannot be defined in the schema itse
 
 ```js
 module.exports = ({mongoose}) => ({
-	schema	: new mongoose.Schema({
-		name	: String,
-		group	: { type: String, required: true },
-		friends	: [ { type: String, required: true } ]
-	}),
+    schema  : new mongoose.Schema({
+        name    : String,
+        group   : { type: String, required: true },
+        friends : [ { type: String, required: true } ]
+    }),
 
-	indexes	: {
-		group	: 1,
-		friends	: 1
-	},
+    indexes : {
+        group   : 1,
+        friends : 1
+    },
 
-	// CRUD operations. Remove to disable.
-	find	: {}
+    // CRUD operations. Remove to disable.
+    find    : {}
 })
 ```
 
 Or multiple compound indexes.
 
 ```js
-	indexes	: [
-		{
-			group	: 1,
-			friends	: 1
-		},
-		{
-			group	: 1,
-			name	: 1
-		}
-	]
+    indexes : [
+        {
+            group   : 1,
+            friends : 1
+        },
+        {
+            group   : 1,
+            name    : 1
+        }
+    ]
 ```
 
 > __Note:__ Although this is useful for development, it's recommended to define indexes manually, so that your application restarts faster.
@@ -233,25 +233,25 @@ For defining your schema, take a look at the [Mongoose Schema](https://mongoosej
 
 ```js
 module.exports = ({mongoose}) => ({
-	schema	: new mongoose.Schema({
-		name	: String,
-		email	: String,
+    schema    : new mongoose.Schema({
+        name    : String,
+        email    : String,
 
-		// One-to-many relationship
-		myTests	: [{
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}],
+        // One-to-many relationship
+        myTests    : [{
+            type    : mongoose.Schema.Types.ObjectId,
+            ref        : 'Test'
+        }],
 
-		// One-to-one relationship
-		lastUsed	: {
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}
-	}),
+        // One-to-one relationship
+        lastUsed    : {
+            type    : mongoose.Schema.Types.ObjectId,
+            ref        : 'Test'
+        }
+    }),
 
-	// CRUD operations. Remove to disable.
-	find	: {}
+    // CRUD operations. Remove to disable.
+    find    : {}
 })
 ```
 
@@ -265,33 +265,18 @@ Once you've written some custom authentication logic, you can create an _Express
 
 ```js
 module.exports = ({mongoose}) => ({
-	schema	: new mongoose.Schema({
-		name	: String,
-		email	: String,
+    schema,
 
-		// One-to-many relationship
-		myTests	: [{
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}],
+    authn(req, res, next) {
+        // Allow access for user
+        if (req.user) return next()
 
-		// One-to-one relationship
-		lastUsed	: {
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}
-	}),
+        // Deny access for everyone else
+        next(new Error("You are not logged in"))
+    },
 
-	authn(req, res, next) {
-		// Allow access for user
-	    if (req.user) return next()
-
-		// Deny access for everyone else
-	    next(new Error("You are not logged in"))
-	},
-
-	// CRUD operations. Remove to disable.
-	find	: {}
+    // CRUD operations. Remove to disable.
+    find    : {}
 })
 ```
 
@@ -299,48 +284,33 @@ Let's make it a bit more complex. What if you want to be publicly readable, but 
 
 ```js
 function authn(req, res, next) {
-	// Allow access for user
-	if (req.user) return next()
+    // Allow access for user
+    if (res.locals.user) return next()
 
-	// Deny access for everyone else
-	next(new Error("You are not logged in"))
+    // Deny access for everyone else
+    next(new Error("You are not logged in"))
 }
 
 module.exports = ({mongoose}) => ({
-	schema	: new mongoose.Schema({
-		name	: String,
-		email	: String,
+    schema,
 
-		// One-to-many relationship
-		myTests	: [{
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}],
+    // CRUD operations. Remove to disable.
+    find    : {},
+    create  : {
+        authn
+    },
+    update  : {
+        authn
+    },
+    delete  : {
+        authn(req, res, next) {
+            // Allow access for admin
+            if (res.locals.user && res.locals.isAdmin) return next()
 
-		// One-to-one relationship
-		lastUsed	: {
-			type	: mongoose.Schema.Types.ObjectId,
-			ref		: 'Test'
-		}
-	}),
-
-	// CRUD operations. Remove to disable.
-	find	: {},
-	create	: {
-		authn
-	},
-	update	: {
-		authn
-	},
-	delete	: {
-		authn(req, res, next) {
-			// Allow access for admin
-			if (req.user && req.user.isAdmin) return next()
-
-			// Deny access for everyone else
-			next(new Error("You do not have administrator privileges"))
-		}
-	}
+            // Deny access for everyone else
+            next(new Error("You do not have administrator privileges"))
+        }
+    }
 })
 ```
 
@@ -349,16 +319,16 @@ You may have a global `authn` function in your `jsMini` defenition, but are look
 `someRoute.js`:
 ```js
 module.exports = ({mongoose}) => ({
-	description	: 'This route will override global authn',
-	schema		: , // ...
+    description    : 'This route will override global authn',
+    schema,
 
-	authn(req, res, next) {
-		req.locals.authenticated = true
+    authn(req, res, next) {
+        res.locals.authenticated = true
 
-		return next()
-	},
+        return next()
+    },
 
-	find	: { // ...
+    find,
 ```
 
 `index.js`:
@@ -366,7 +336,7 @@ module.exports = ({mongoose}) => ({
 const jsMini = require('jsonapi-server-mini')
 
 function authn() {
-	if (res.locals.authenticated === true) return next() // Granted elsewhere
+    if (res.locals.authenticated === true) return next() // Granted elsewhere
 }
 
 jsMini({ authn })
@@ -374,29 +344,144 @@ jsMini({ authn })
 
 ### Authorization
 
-`authz`
+Even when your user is authenticated, they are probably not supposed to access data from another user. Authorization allows for more granular control. Add the `authz` function to the specific CRUD, route, or global configuration you would like to apply rules to.
 
-__To do__
+You can either add full express middleware:
 
-### Select
+```javascript
+function authz(req, res, next) {
+    const { query } = req.jsMini
+    const isAdmin = res.locals.role == 'admin'
+    const adminOnly = {$ne: true}
 
-_To do_
+    if (isAdmin)
+        req.jsMini.query = {...query, adminOnly}
+
+    next()
+}
+```
+
+A shortcut function with one argument, returning a mandatory query selector:
+
+
+```javascript
+function authz(req) {
+    const { userId } = req.res.locals
+
+    return {
+        userId
+    }
+}
+```
+
+Or a shortcut function simply returning a boolean indicating access granted or denied:
+
+```javascript
+function authz(req) {
+    return ['subscriber', 'editor'].includes(res.locals.role)
+}
+```
+
+#### Example
+
+```javascript
+function authn(req, res, next) {
+    // Allow access for user
+    if (res.locals.user) return next()
+
+    // Deny access for everyone else
+    next(new Error("You are not logged in"))
+}
+
+function authz(req) {
+    const { userId } = req.res.locals
+
+    // Assuming user created resources have the users' userId attribute
+    return {
+        userId
+    }
+}
+
+module.exports = ({mongoose}) => ({
+    schema,
+
+    // Everyone can find
+    find    : {},
+
+    // All users can create
+    create  : {
+        authn
+    },
+
+    // Only owners can update or delete
+    update  : {
+        authn,
+        authz
+    },
+    delete  : {
+        authn,
+        authz
+    }
+})
+```
 
 ## JSON:API support
 
-_To do_
+The current implementation attempts to follow the basics of the [JSON:API 1.0 spec](https://jsonapi.org/format/).
 
 ### Sort
 
-_To do_
+Allow sorting using a preconfigured `sort` _Object_ on the route configuration, or a `sort` _String_ in your query.
+
+```
+?sort=-date
+```
 
 ### Filter
 
-_To do_
+Filter (or 'query') results with a `filter` _String_ in your query.
+
+```
+?filter[type]=order&filter[quantity]=<10
+```
+
+There are a couple of filter operators for making advanced queries:
+
+- `<=` like MongoDB's `$lte`
+- `>=` like MongoDB's `$gte`
+- `<` like MongoDB's `$lt`
+- `>` like MongoDB's `$gt`
+- `:` partial match (case insensitive)
+- `~` exact match (case insensitive)
+- `:~` ends with (case insensitive)
+- `~:` starts with (case insensitive)
+- `!` is like MongoDB's `$ne`
 
 ### Fields
 
-_To do_
+Choose what fields to select from documents. You can either predefine this in your route, or instruct the jsonapi server with your querystring.
+
+#### Fields preconfigured in route
+
+Add a `field` object to your route, with keys being the fieldnames you want to include (`1`) or exclude (`0`). You can only include or exclude all fields. Not a mix of both.
+
+```js
+module.exports = ({mongoose}) => ({
+    // ...
+
+    fields  : {
+        bio         : 0,
+        friends     : 0
+    },
+```
+
+#### Fields instructed in querystring
+
+Submit a comma separated value with the name of fields you want to include. _or_ a list of names you want to exclude prepended by a minus symbol.
+
+```
+GET api/users?fields=-bio,-friends
+```
 
 ### Include
 
@@ -410,17 +495,17 @@ Perhaps you're trying to do something slightly more complicated, but you are not
 
 ```js
 module.exports = ({mongoose}) => ({
-	// ...
+    // ...
 
-	middleware(req, res, next) {
-		// Executed before _every_ crud operation on this route
-		return next()
-	},
+    middleware(req, res, next) {
+        // Executed before _every_ crud operation on this route
+        return next()
+    },
 
-	find	: {
-		middleware(req, res, next) {
-			// Executed before every _find_ operation on this route
-			return next()
+    find    : {
+        middleware(req, res, next) {
+            // Executed before every _find_ operation on this route
+            return next()
 ```
 
 #### Shortcut middleware
@@ -428,11 +513,11 @@ module.exports = ({mongoose}) => ({
 Often you'll just want to pre-fill the query (i.e. `req.jsMini.query`) with a non-async object-returning function, similar to `authz`. You can suffice with a single `req` parameter:
 
 ```js
-	middleware(req) {
-		return {
-			customFilter: 'presetValue'
-		}
-	},
+    middleware(req) {
+        return {
+            customFilter: 'presetValue'
+        }
+    },
 ```
 
 #### Pre- and post middleware
@@ -440,10 +525,10 @@ Often you'll just want to pre-fill the query (i.e. `req.jsMini.query`) with a no
 If you want to use a middleware function to execute _after_ the query has been done, you can make `middleware` an object with a (`pre` and/or) `post` function:
 
 ```js
-	middleware {
-		pre(req, res, next) { /* ... */ },
-		post(req, res, next) { /* ... */ }
-	},
+    middleware {
+        pre(req, res, next) { /* ... */ },
+        post(req, res, next) { /* ... */ }
+    },
 ```
 
 # Contributing
