@@ -520,14 +520,15 @@ Often you'll just want to pre-fill the query (i.e. `req.jsMini.query`) with a no
     },
 ```
 
-#### Pre- and post middleware
+#### Other middleware
 
-If you want to use a middleware function to execute _after_ the query has been done, you can make `middleware` an object with a (`pre` and/or) `post` function:
+You can turn middleware into an object with multiple hooks. `pre(req)` is the same as `middleware(req)`. With this notation, you can add advanced middleware:
 
 ```js
     middleware {
         pre(req, res, next) { /* ... */ },
-        post(req, res, next) { /* ... */ }
+        beforeSerializer(data) { /* ... */ },   // findOne or findMany
+        afterSerializer(json) { /* ... */ },
     },
 ```
 

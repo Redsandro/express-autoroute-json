@@ -2,7 +2,7 @@
  * @author Sander Steenhuis <info@redsandro.com> (https://www.Redsandro.com)
  * @license MIT
  */
-const routeMapper	= require('./lib/routeMapper')
+const routeFactory	= require('./lib/routeFactory')
 const path			= require('path')
 const recursive		= require('recursive-readdir')
 const bodyParser	= require('body-parser')
@@ -38,7 +38,7 @@ module.exports = async(args = {}) => {
 		const indexes		= route.indexes
 		const relationships	= getRefs(route.schema)
 		const options		= { model, args, relationships, ...route }
-		const crud			= routeMapper(options)
+		const crud			= routeFactory(options)
 
 		for (const method in crud) {
 			for (const path in crud[method]) {
