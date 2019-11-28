@@ -219,6 +219,23 @@ Or multiple compound indexes.
     ]
 ```
 
+You can specify index options _only_ when writing your indexes in an array, like the second example above. Then wrap your index in a second array, and specify the options as the second item.
+
+```js
+    indexes : [
+        [
+            {
+                createdAt : 1
+            },
+            {
+                expireAfterSeconds : 3600
+            }
+        ],
+        // [ another index ]
+    ]
+```
+
+
 > __Note:__ Although this is useful for development, it's recommended to define indexes manually, so that your application restarts faster.
 
 ### CRUD method options

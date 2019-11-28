@@ -35,10 +35,11 @@ module.exports = async(args = {}) => {
 		const type			= path.basename(file, '.js').replace(/^\w/, c => c.toUpperCase())
 		const route			= require(file)({mongoose})
 		const model			= mongoose.model(type, route.schema)
-		const indexes		= route.indexes
 		const relationships	= getRefs(route.schema)
 		const options		= { model, args, relationships, ...route }
 		const crud			= routeFactory(options)
+		let indexes			= route.indexes
+		let idxOpts			= {}
 
 		for (const method in crud) {
 			for (const path in crud[method]) {
@@ -47,10 +48,17 @@ module.exports = async(args = {}) => {
 			}
 		}
 
-		// While nice for development, it is recommended this behavior be disabled in production.
-		// TODO: Let's make this configurable.
+		/**
+		 * While nice for development, it is recommended this behavior be disabled in production.
+		 * @see https://mongoosejs.com/docs/guide.html#indexes
+		 * @todo make indexing configurable
+		 */
 		if (indexes) {
-			[].concat(route.indexes).forEach(index => route.schema.index(index))
+			if (!Array.isArray(indexes)) indexes = [indexes]
+			indexes.forEach(index => {
+				if (Array.isArray(index)) [index, idxOpts] = index
+				route.schema.index(index, idxOpts)
+			})
 			model.createIndexes(err => err && logger.error(err.message))
 		}
 	})
