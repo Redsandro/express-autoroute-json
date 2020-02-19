@@ -178,9 +178,9 @@ jsMini({
 
 ### Route options
 
-* `schema` _Schema_ A Mongoose Schema
-* `description` _To do_
-* `indexes` _Object or Array_ Define one or more indexes
+* [`schema`](#schema) _Schema_ A Mongoose Schema
+* `description` _String_ Describe your route
+* [`indexes`](#indexes) _Object or Array_ Define one or more indexes
 
 #### Indexes
 
@@ -240,8 +240,8 @@ You can specify index options _only_ when writing your indexes in an array, like
 
 ### CRUD method options
 
-* `authn` _function(req, res, next) -> Callback_ _To do_
-* `authz` _function(req) -> Object_ _To do_
+* [`authn`](#authentication) _function(req, res, next) -> Callback_
+* [`authz`](#authorization) _function(req) -> Object_
 * `find.query` _To do_
 
 ### Schema
@@ -574,7 +574,7 @@ npm run test-mocha
 ```
 
 
-# Licence
+# License
 
 Copyright (c) 2018 - 2019, Redsandro Media <info@redsandro.com>
 
