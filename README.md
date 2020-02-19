@@ -549,6 +549,8 @@ You can turn middleware into an object with multiple hooks. `pre(req)` is the sa
     },
 ```
 
+Note that `beforeSerializer` and `afterSerializer` will be applied to both `GET` and `PATCH` requests. We can't have carefully hidden attributes show up by sending a `PATCH` request.
+
 # Contributing
 
 We like to keep the scope of this module very small and easy to maintain in order to allow for quickly building small yet decent apps. Any pull request that adds complexity not part of the JSON:API spec will be rejected.
